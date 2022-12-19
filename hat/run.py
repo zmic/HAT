@@ -17,13 +17,13 @@ def hat_upscaler(path_opt_yaml):
     model = build_model(opt)
     transform = transforms.Compose([transforms.PILToTensor()])
 
-    def upscale(img : np.ndarray, save_img_path):
+    def upscale(img : np.ndarray, save_img_path, bgr2rgb=False):
         '''
         img = transform(img)
         img = img.to(torch.float32) / 255.
         img = torch.permute(img, (2,0,1))
         '''
-        img = img2tensor(img, bgr2rgb=True, float32=True)
+        img = img2tensor(img, bgr2rgb=bgr2rgb, float32=True)
         img = img[None, :]
         model.feed_data({'lq':img})
         model.pre_process()
@@ -44,14 +44,16 @@ if __name__ == '__main__':
     config_file = 'HAT_SRx3-tiled.yml'
     config_file = Path(__file__).parent.parent / "options" / "run" / config_file
     upscale = hat_upscaler(config_file)
-    if 0:
+    if 1:
         from PIL import Image
         img = Image.open(sys.argv[-1])
         img = np.asarray(img).astype(np.float32) / 255.
+        bgr2rgb = False
     else:
         img = imfrombytes(open(sys.argv[-1], "rb").read(), float32=True)
+        bgr2rgb = True
 
-    upscale(img, "out.png")
+    upscale(img, "out2.png", bgr2rgb=bgr2rgb)
 
 
 

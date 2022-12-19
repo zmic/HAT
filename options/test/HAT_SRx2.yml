@@ -4,12 +4,16 @@ scale: 2
 num_gpu: 1  # set num_gpu: 0 for cpu mode
 manual_seed: 0
 
+tile: # use the tile mode for limited GPU memory when testing.
+  tile_size: 256 # the higher, the more utilized GPU memory and the less performance change against the full image. must be an integer multiple of the window size.
+  tile_pad: 32 # overlapping between adjacency patches.must be an integer multiple of the window size.
+
+
 datasets:
   test_1:  # the 1st test dataset
-    name: Set5
-    type: PairedImageDataset
-    dataroot_gt: ./datasets/Set5/GTmod2
-    dataroot_lq: ./datasets/Set5/LRbicx2
+    name: k2
+    type: SingleImageDataset
+    dataroot_lq: H:\DEEPL\out\DU2\RYZEN\epoch-2\_K\k-bimbo\k2
     io_backend:
       type: disk
 
@@ -76,12 +80,4 @@ val:
   save_img: true
   suffix: ~  # add suffix to saved images, if None, use exp name
 
-  metrics:
-    psnr: # metric name, can be arbitrary
-      type: calculate_psnr
-      crop_border: 2
-      test_y_channel: true
-    ssim:
-      type: calculate_ssim
-      crop_border: 2
-      test_y_channel: true
+
