@@ -1,6 +1,6 @@
-name: HAT_SRx3
+name: HAT_SRx2
 model_type: HATModel
-scale: 3
+scale: 2
 num_gpu: 1  # set num_gpu: 0 for cpu mode
 manual_seed: 0
 
@@ -9,10 +9,11 @@ tile: # use the tile mode for limited GPU memory when testing.
   tile_pad: 32 # overlapping between adjacency patches.must be an integer multiple of the window size.
 
 
+
 # network structures
 network_g:
   type: HAT
-  upscale: 3
+  upscale: 2
   in_chans: 3
   img_size: 64
   window_size: 16
@@ -28,8 +29,10 @@ network_g:
   upsampler: 'pixelshuffle'
   resi_connection: '1conv'
 
+
 # path
 path:
-  pretrain_network_g: ./experiments/pretrained_models/HAT_SRx3.pth
+  pretrain_network_g: ./experiments/pretrained_models/HAT_SRx2.pth
   strict_load_g: true
   param_key_g: 'params_ema'
+
