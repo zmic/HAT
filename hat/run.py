@@ -6,7 +6,7 @@ from basicsr.utils.options import ordered_yaml
 from basicsr.models import build_model
 import hat.models
 
-def hat_upscaler(path_opt_yaml):
+def hat_upscaler(path_opt_yaml, save_function=False):
     hat_root = Path(__file__).parent.parent
     path_opt_yaml = hat_root / "options" / "run" / path_opt_yaml
 
@@ -18,7 +18,7 @@ def hat_upscaler(path_opt_yaml):
     opt['path']['pretrain_network_g'] = hat_root / opt['path']['pretrain_network_g']
     model = build_model(opt)
 
-    def upscale(img : np.ndarray, save_img_path, bgr2rgb=False):
+    def upscale(img : np.ndarray, bgr2rgb=False):
         img = img2tensor(img, bgr2rgb=bgr2rgb, float32=True)
         img = img[None, :]
         model.feed_data({'lq':img})
@@ -31,14 +31,20 @@ def hat_upscaler(path_opt_yaml):
 
         sr_img = model.get_current_visuals()['result']
         sr_img = tensor2img([sr_img])
-        imwrite(sr_img, str(save_img_path))
+        return sr_img
+
+    if save_function:
+        def upscale_save(img : np.ndarray, save_img_path, bgr2rgb=False):
+            sr_img = upscale(img, save_img_path, bgr2rgb)
+            imwrite(sr_img, str(save_img_path))
+        return upscale_save
 
     return upscale
 
 if __name__ == '__main__':
     import sys
     config_file = 'HAT_SRx3-tiled.yml'
-    upscale = hat_upscaler(config_file)
+    upscale_save = hat_upscaler(config_file, save_function=True)
     if 1:
         # use this method if you already have an PIL or numpy image in memory
         from PIL import Image
@@ -49,7 +55,7 @@ if __name__ == '__main__':
         img = imfrombytes(open(sys.argv[-1], "rb").read(), float32=True)
         bgr2rgb = True
 
-    upscale(img, "out2.jpg", bgr2rgb=bgr2rgb)
+    upscale_save(img, "out2.jpg", bgr2rgb=bgr2rgb)
 
 
 
